@@ -9,7 +9,7 @@ export function QuestionList({ questions }: QuestionListProps) {
     <ul>
       {questions.map((q, idx) => (
         <li key={`${q.category}-${idx}`}>
-          <strong>{q.category}:</strong> {q.question}
+          <strong>{q.category}:</strong> {q.question} <em>({q.difficulty})</em>
         </li>
       ))}
     </ul>

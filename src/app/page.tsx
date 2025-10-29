@@ -5,6 +5,7 @@ import { Question } from "./types";
 import { CategoryList } from "../components/CategoryList";
 import { CategoryDistribution } from "../components/CategoryDistribution";
 import { QuestionList } from "../components/QuestionList";
+import { DifficultyDistribution } from "../components/DifficultyDistribution";
 
 const URL = "https://opentdb.com/api.php?amount=50";
 
@@ -60,13 +61,13 @@ export default function Home() {
     }
   });
 
-  //   const filteredQuestions = questions.filter((q) => {
-  //     const { category, subcategory } = selected;
-  //     if (!category) return true;
-  //     if (subcategory) return q.category === `${category}: ${subcategory}`;
-  //     return q.category.startsWith(category);
-  //   });
-  
+  const filteredQuestions = questions.filter((q) => {
+    const { category, subcategory } = selected;
+    if (!category) return true;
+    if (subcategory) return q.category === `${category}: ${subcategory}`;
+    return q.category.startsWith(category);
+  });
+
   const categoryDistribution = Object.entries(categoryMap).map(([category]) => {
     const count = questions.filter((q) =>
       q.category.startsWith(category)
@@ -80,6 +81,13 @@ export default function Home() {
     if (sub) counts[`${main}: ${sub}`] = (counts[`${main}: ${sub}`] || 0) + 1;
     counts[main] = (counts[main] || 0) + 1;
   });
+  const difficultyCounts: Record<string, number> = {};
+  filteredQuestions.forEach((q) => {
+    difficultyCounts[q.difficulty] = (difficultyCounts[q.difficulty] || 0) + 1;
+  });
+  const difficultyDistribution = Object.entries(difficultyCounts).map(
+    ([name, value]) => ({ name, value })
+  );
 
   return (
     <div className="flex">
@@ -94,6 +102,7 @@ export default function Home() {
       <div className="p-8 w-full">
         <h1 className="text-2xl font-bold mb-4">Trivia Questions</h1>
         <CategoryDistribution categoryDistribution={categoryDistribution} />
+        <DifficultyDistribution data={difficultyDistribution} />
         {/* <QuestionList questions={filteredQuestions} /> */}
       </div>
     </div>
