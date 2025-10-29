@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# build outputs
+.next/
+out/
+dist/
+build/
+
+# TypeScript
+*.tsbuildinfo
+
+# editor settings
+.vscode/
+
+# OS-specific files
+.DS_Store
+
+# lockfiles 
+package-lock.json
+
+
