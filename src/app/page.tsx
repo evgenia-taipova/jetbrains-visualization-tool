@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Question } from "./types";
 import { CategoryList } from "../components/CategoryList";
+import { CategoryDistribution } from "../components/CategoryDistribution";
+import { QuestionList } from "../components/QuestionList";
 
 const URL = "https://opentdb.com/api.php?amount=50";
 
@@ -58,31 +60,41 @@ export default function Home() {
     }
   });
 
-  const filteredQuestions = questions.filter((q) => {
-    const { category, subcategory } = selected;
-    if (!category) return true;
-    if (subcategory) return q.category === `${category}: ${subcategory}`;
-    return q.category.startsWith(category);
+  //   const filteredQuestions = questions.filter((q) => {
+  //     const { category, subcategory } = selected;
+  //     if (!category) return true;
+  //     if (subcategory) return q.category === `${category}: ${subcategory}`;
+  //     return q.category.startsWith(category);
+  //   });
+  
+  const categoryDistribution = Object.entries(categoryMap).map(([category]) => {
+    const count = questions.filter((q) =>
+      q.category.startsWith(category)
+    ).length;
+    return { name: category, value: count };
+  });
+  const counts: Record<string, number> = {};
+
+  questions.forEach((q) => {
+    const { main, sub } = parseCategory(q.category);
+    if (sub) counts[`${main}: ${sub}`] = (counts[`${main}: ${sub}`] || 0) + 1;
+    counts[main] = (counts[main] || 0) + 1;
   });
 
   return (
     <div className="flex">
       <CategoryList
         categories={categoryMap}
+        counts={counts}
         onSelect={(category, subcategory) =>
           setSelected({ category, subcategory })
         }
       />
 
-      <div className="p-8 ">
+      <div className="p-8 w-full">
         <h1 className="text-2xl font-bold mb-4">Trivia Questions</h1>
-        <ul>
-          {filteredQuestions.map((q, idx) => (
-            <li key={idx}>
-              <strong>{q.category}:</strong> {q.question}
-            </li>
-          ))}
-        </ul>
+        <CategoryDistribution categoryDistribution={categoryDistribution} />
+        {/* <QuestionList questions={filteredQuestions} /> */}
       </div>
     </div>
   );
