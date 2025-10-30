@@ -70,7 +70,11 @@ export default function Home() {
 
   let categoryDistribution: { name: string; value: number }[] = [];
 
-  if (selected.category) {
+  if (
+    selected.category &&
+    !selected.subcategory &&
+    (categoryMap[selected.category]?.length || 0)
+  ) {
     const subcategories = categoryMap[selected.category] || [];
     categoryDistribution = subcategories.map((sub) => {
       const count = questions.filter(
@@ -78,13 +82,15 @@ export default function Home() {
       ).length;
       return { name: sub, value: count };
     });
-  } else {
+  } else if (!selected.category) {
     categoryDistribution = Object.entries(categoryMap).map(([category]) => {
       const count = questions.filter((q) =>
         q.category.startsWith(category)
       ).length;
       return { name: category, value: count };
     });
+  } else {
+    categoryDistribution = [];
   }
 
   const counts: Record<string, number> = {};
@@ -115,7 +121,9 @@ export default function Home() {
       <div className="p-8 w-full">
         <h1 className="text-2xl font-bold mb-4">Trivia Questions</h1>
         <div className="flex gap-8 mb-8">
-          <CategoryDistribution categoryDistribution={categoryDistribution} />
+          {categoryDistribution.length > 0 && (
+            <CategoryDistribution categoryDistribution={categoryDistribution} />
+          )}
           <DifficultyDistribution data={difficultyDistribution} />
         </div>
         {/* <QuestionList questions={filteredQuestions} /> */}
