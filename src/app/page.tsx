@@ -74,27 +74,30 @@ export default function Home() {
 
   let categoryDistribution: { name: string; value: number }[] = [];
 
-  if (
-    selected.category &&
-    !selected.subcategory &&
-    (categoryMap[selected.category]?.length || 0)
-  ) {
-    const subcategories = categoryMap[selected.category] || [];
-    categoryDistribution = subcategories.map((sub) => {
-      const count = questions.filter(
-        (q) => q.category === `${selected.category}: ${sub}`
-      ).length;
-      return { name: sub, value: count };
-    });
-  } else if (!selected.category) {
-    categoryDistribution = Object.entries(categoryMap).map(([category]) => {
-      const count = questions.filter((q) =>
-        q.category.startsWith(category)
-      ).length;
-      return { name: category, value: count };
-    });
+  if (!selected.category) {
+    categoryDistribution = Object.keys(categoryMap).map((category) => ({
+      name: category,
+      value: questions.filter((q) => q.category.startsWith(category)).length,
+    }));
+  } else if (selected.subcategory) {
+    const fullCategory = `${selected.category}: ${selected.subcategory}`;
+    const count = questions.filter((q) => q.category === fullCategory).length;
+    categoryDistribution = [{ name: fullCategory, value: count }];
   } else {
-    categoryDistribution = [];
+    const subcategories = categoryMap[selected.category] || [];
+    if (subcategories.length > 0) {
+      categoryDistribution = subcategories.map((sub) => ({
+        name: sub,
+        value: questions.filter(
+          (q) => q.category === `${selected.category}: ${sub}`
+        ).length,
+      }));
+    } else {
+      const count = questions.filter(
+        (q) => parseCategory(q.category).main === selected.category
+      ).length;
+      categoryDistribution = [{ name: selected.category, value: count }];
+    }
   }
 
   const counts: Record<string, number> = {};
@@ -129,10 +132,10 @@ export default function Home() {
       />
 
       <div className="p-8 w-full">
-        <h1 className="text-2xl font-bold mb-4">
+        <h1 className="text-2xl font-bold mb-4 text-center">
           Mini Vizualization App for Trivia Questions
         </h1>
-        <div className="p-4 mb-4 border rounded bg-gray-50">
+        <div className="p-4 mb-4 border rounded bg-gray-50 text-center">
           <p>
             <strong>Selected Category:</strong> {selectedText}
           </p>
@@ -140,7 +143,7 @@ export default function Home() {
             <strong>Total Questions:</strong> {totalFilteredQuestions}
           </p>
         </div>
-        <div className="flex gap-8 mb-8">
+        <div className="flex gap-8 mb-8 align-center">
           {categoryDistribution.length > 0 && (
             <CategoryDistribution categoryDistribution={categoryDistribution} />
           )}

@@ -28,8 +28,8 @@ export function CategoryDistribution({ categoryDistribution }: Props) {
           <XAxis type="number" />
           <YAxis type="category" dataKey="name" interval={0} />
           <Tooltip />
-          <Bar dataKey="value">
-            <LabelList dataKey="value" />
+          <Bar dataKey="value" barSize={30} fill="#f87171">
+            <LabelList dataKey="value" fill="black" />
           </Bar>
         </BarChart>
       </ResponsiveContainer>

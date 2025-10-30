@@ -23,10 +23,10 @@ export function CategoryList({
     onSelect(category, subcategory);
   };
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-col gap-2 w-64 border-r ">
       <h2
         onClick={() => handleSelect(undefined, undefined)}
-        className={!selected.category ? "font-bold text-blue-500" : ""}
+        className={`cursor-pointer ${!selected.category ? "font-bold text-blue-500" : ""}`}
       >
         All Categories
       </h2>
@@ -35,13 +35,13 @@ export function CategoryList({
         <div key={main}>
           <h2
             onClick={() => handleSelect(main)}
-            className={
+            className={`cursor-pointer ${
               selected.category === main && !selected.subcategory
                 ? "font-bold text-blue-500"
                 : ""
-            }
+            }`}
           >
-            {main}({counts[main] || 0})
+            {main} ({counts[main] || 0})
           </h2>
           {subs.length > 0 && (
             <ul className="ml-4">
@@ -49,13 +49,13 @@ export function CategoryList({
                 <li
                   key={sub}
                   onClick={() => handleSelect(main, sub)}
-                  className={
+                  className={`cursor-pointer ${
                     selected.category === main && selected.subcategory === sub
                       ? "font-bold text-blue-500"
                       : ""
-                  }
+                  }`}
                 >
-                  {sub}({counts[`${main}: ${sub}`] || 0})
+                  {sub} ({counts[`${main}: ${sub}`] || 0})
                 </li>
               ))}
             </ul>
