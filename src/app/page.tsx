@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react"; 
 import { CategoryList } from "../components/CategoryList";
 import { CategoryDistribution } from "../components/CategoryDistribution";
 import { QuestionList } from "../components/QuestionList";
@@ -9,11 +9,7 @@ import { Loader } from "../components/ui/Loader";
 import { ErrorDisplay } from "../components/ui/ErrorDisplay";
 import { useFilteredQuestions } from "../hooks/useFilteredQuestions";
 import { useTriviaQuestions } from "../hooks/useTriviaQuestions";
-
-function parseCategory(category: string) {
-  const [main, sub] = category.split(":").map((s) => s.trim());
-  return { main, sub };
-}
+import { calculateMetrics } from "../utils/metrics";
 
 export default function Home() {
   const [selected, setSelected] = useState<{
@@ -22,8 +18,18 @@ export default function Home() {
   }>({});
 
   const { questions, error, isLoading } = useTriviaQuestions();
-
   const filteredQuestions = useFilteredQuestions(questions, selected);
+
+  const {
+    categoryMap, 
+    counts,
+    categoryDistribution,
+    difficultyDistribution,
+    totalFilteredQuestions,
+    selectedText,
+  } = useMemo(() => {
+    return calculateMetrics(questions, filteredQuestions, selected);
+  }, [questions, filteredQuestions, selected]); 
 
   if (isLoading) {
     return <Loader />;
@@ -32,63 +38,6 @@ export default function Home() {
   if (error) {
     return <ErrorDisplay error={error} />;
   }
-
-  const categoryMap: Record<string, string[]> = {};
-  questions.forEach((q) => {
-    const { main, sub } = parseCategory(q.category);
-    categoryMap[main] = categoryMap[main] ?? [];
-    if (sub && !categoryMap[main].includes(sub)) {
-      categoryMap[main].push(sub);
-    }
-  });
-
-  let categoryDistribution: { name: string; value: number }[] = [];
-  if (!selected.category) {
-    categoryDistribution = Object.keys(categoryMap).map((category) => ({
-      name: category,
-      value: questions.filter((q) => q.category.startsWith(category)).length,
-    }));
-  } else if (selected.subcategory) {
-    const fullCategory = `${selected.category}: ${selected.subcategory}`;
-    const count = questions.filter((q) => q.category === fullCategory).length;
-    categoryDistribution = [{ name: fullCategory, value: count }];
-  } else {
-    const subcategories = categoryMap[selected.category] || [];
-    if (subcategories.length > 0) {
-      categoryDistribution = subcategories.map((sub) => ({
-        name: sub,
-        value: questions.filter(
-          (q) => q.category === `${selected.category}: ${sub}`
-        ).length,
-      }));
-    } else {
-      const count = questions.filter(
-        (q) => parseCategory(q.category).main === selected.category
-      ).length;
-      categoryDistribution = [{ name: selected.category, value: count }];
-    }
-  }
-
-  const counts: Record<string, number> = {};
-  questions.forEach((q) => {
-    const { main, sub } = parseCategory(q.category);
-    if (sub) counts[`${main}: ${sub}`] = (counts[`${main}: ${sub}`] || 0) + 1;
-    counts[main] = (counts[main] || 0) + 1;
-  });
-
-  const difficultyCounts: Record<string, number> = {};
-  filteredQuestions.forEach((q) => {
-    difficultyCounts[q.difficulty] = (difficultyCounts[q.difficulty] || 0) + 1;
-  });
-  const difficultyDistribution = Object.entries(difficultyCounts).map(
-    ([name, value]) => ({ name, value })
-  );
-
-  const totalFilteredQuestions = filteredQuestions.length;
-
-  const selectedText = selected.subcategory
-    ? `${selected.category}: ${selected.subcategory}`
-    : selected.category || "All categories";
 
   return (
     <div className="flex">
