@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 interface CategoryListProps {
   categories: Record<string, string[]>;
   counts: Record<string, number>;
@@ -11,19 +13,48 @@ export function CategoryList({
   counts,
   onSelect,
 }: CategoryListProps) {
+  const [selected, setSelected] = useState<{
+    category?: string;
+    subcategory?: string;
+  }>({});
+
+  const handleSelect = (category?: string, subcategory?: string) => {
+    setSelected({ category, subcategory });
+    onSelect(category, subcategory);
+  };
   return (
     <div className="p-4">
-      <h2 onClick={() => onSelect(undefined)}>All Categories</h2>
+      <h2
+        onClick={() => handleSelect(undefined, undefined)}
+        className={!selected.category ? "font-bold text-blue-500" : ""}
+      >
+        All Categories
+      </h2>
 
       {Object.entries(categories).map(([main, subs]) => (
         <div key={main}>
-          <h2 onClick={() => onSelect(main)}>
+          <h2
+            onClick={() => handleSelect(main)}
+            className={
+              selected.category === main && !selected.subcategory
+                ? "font-bold text-blue-500"
+                : ""
+            }
+          >
             {main}({counts[main] || 0})
           </h2>
           {subs.length > 0 && (
             <ul className="ml-4">
               {subs.map((sub) => (
-                <li key={sub} onClick={() => onSelect(main, sub)}>
+                <li
+                  key={sub}
+                  onClick={() => handleSelect(main, sub)}
+                  className={
+                    selected.category === main && selected.subcategory === sub
+                      ? "font-bold text-blue-500"
+                      : ""
+                  }
+                >
                   {sub}({counts[`${main}: ${sub}`] || 0})
                 </li>
               ))}
