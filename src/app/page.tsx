@@ -6,6 +6,7 @@ import { CategoryList } from "../components/CategoryList";
 import { CategoryDistribution } from "../components/CategoryDistribution";
 import { QuestionList } from "../components/QuestionList";
 import { DifficultyDistribution } from "../components/DifficultyDistribution";
+import { useFilteredQuestions } from "../hooks/useFilteredQuestions";
 
 const URL = "https://opentdb.com/api.php?amount=50";
 
@@ -52,6 +53,7 @@ export default function Home() {
       </div>
     );
   }
+
   const categoryMap: Record<string, string[]> = {};
   questions.forEach((q) => {
     const { main, sub } = parseCategory(q.category);
@@ -61,19 +63,9 @@ export default function Home() {
     }
   });
 
-  const filteredQuestions = questions.filter((q) => {
-    const { category, subcategory } = selected;
-    if (!category) return true;
-    if (subcategory) {
-      return q.category === `${category}: ${subcategory}`;
-    } else {
-      const { main } = parseCategory(q.category);
-      return main === category;
-    }
-  });
+  const filteredQuestions = useFilteredQuestions(questions, selected);
 
   let categoryDistribution: { name: string; value: number }[] = [];
-
   if (!selected.category) {
     categoryDistribution = Object.keys(categoryMap).map((category) => ({
       name: category,
@@ -101,12 +93,12 @@ export default function Home() {
   }
 
   const counts: Record<string, number> = {};
-
   questions.forEach((q) => {
     const { main, sub } = parseCategory(q.category);
     if (sub) counts[`${main}: ${sub}`] = (counts[`${main}: ${sub}`] || 0) + 1;
     counts[main] = (counts[main] || 0) + 1;
   });
+
   const difficultyCounts: Record<string, number> = {};
   filteredQuestions.forEach((q) => {
     difficultyCounts[q.difficulty] = (difficultyCounts[q.difficulty] || 0) + 1;
@@ -143,7 +135,7 @@ export default function Home() {
             <strong>Total Questions:</strong> {totalFilteredQuestions}
           </p>
         </div>
-        <div className="flex gap-8 mb-8 align-center">
+        <div className="flex gap-8 mb-8 items-center">
           {categoryDistribution.length > 0 && (
             <CategoryDistribution categoryDistribution={categoryDistribution} />
           )}
