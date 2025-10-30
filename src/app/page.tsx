@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Question } from "./types";
+import { useState } from "react";
 import { CategoryList } from "../components/CategoryList";
 import { CategoryDistribution } from "../components/CategoryDistribution";
 import { QuestionList } from "../components/QuestionList";
 import { DifficultyDistribution } from "../components/DifficultyDistribution";
 import { useFilteredQuestions } from "../hooks/useFilteredQuestions";
-
-const URL = "https://opentdb.com/api.php?amount=50";
+import { useTriviaQuestions } from "../hooks/useTriviaQuestions";
 
 function parseCategory(category: string) {
   const [main, sub] = category.split(":").map((s) => s.trim());
@@ -16,40 +14,36 @@ function parseCategory(category: string) {
 }
 
 export default function Home() {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<{
     category?: string;
     subcategory?: string;
   }>({});
 
-  useEffect(() => {
-    fetch(URL)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return res.json();
-      })
-      .then((raw: any) => {
-        const results: Question[] = raw.results.map((q: any) => ({
-          type: q.type,
-          difficulty: q.difficulty,
-          category: q.category,
-          question: q.question,
-          correctAnswer: q.correct_answer,
-          incorrectAnswers: q.incorrect_answers,
-        }));
-        setQuestions(results);
-      })
-      .catch((err) => setError(err.message));
-  }, []);
+  const { questions, error, isLoading } = useTriviaQuestions();
+
+  const filteredQuestions = useFilteredQuestions(questions, selected);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <h1 className="text-2xl">Loading questions...</h1>
+      </div>
+    );
+  }
+
   if (error) {
     return (
-      <div className="p-8 text-center">
+      <div className="flex flex-col gap-4 justify-center items-center h-screen">
         <h1 className="text-3xl font-bold text-red-600">
-          Error Fetching Trivia Questions
+          Error fetching questions
         </h1>
-        <p>Please try again later.</p>
-        <p className="text-sm text-gray-400">{error}</p>
+        <p className="text-gray-400">{error}</p>
+        <button 
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-800 transition-colors cursor-pointer"
+          >
+            Try again
+          </button>
       </div>
     );
   }
@@ -62,8 +56,6 @@ export default function Home() {
       categoryMap[main].push(sub);
     }
   });
-
-  const filteredQuestions = useFilteredQuestions(questions, selected);
 
   let categoryDistribution: { name: string; value: number }[] = [];
   if (!selected.category) {

@@ -21,7 +21,7 @@ export function useFilteredQuestions(
     if (!category) return questions;
 
     return questions.filter((q) => {
-      const { main, sub } = parseCategory(q.category);
+      const { main } = parseCategory(q.category);
       if (subcategory) return q.category === `${category}: ${subcategory}`;
       return main === category;
     });
