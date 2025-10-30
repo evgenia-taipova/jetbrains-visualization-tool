@@ -11,7 +11,7 @@ type CategoryMap = Record<string, string[]>;
 export function calculateMetrics(
   questions: Question[],
   filteredQuestions: Question[],
-  selected: SelectedCategory
+  selected: SelectedCategory,
 ) {
   const categoryMap: CategoryMap = {};
   const counts: Record<string, number> = {};
@@ -21,7 +21,7 @@ export function calculateMetrics(
 
     if (!categoryMap[main]) {
       categoryMap[main] = [];
-      }
+    }
 
     if (sub && !categoryMap[main].includes(sub)) {
       categoryMap[main].push(sub);
@@ -29,7 +29,7 @@ export function calculateMetrics(
 
     if (sub) {
       counts[`${main}: ${sub}`] = (counts[`${main}: ${sub}`] || 0) + 1;
-    } 
+    }
 
     counts[main] = (counts[main] || 0) + 1;
   });
@@ -41,13 +41,13 @@ export function calculateMetrics(
     categoryDistribution = getSpecificSubcategoryDistribution(
       questions,
       category,
-      subcategory
+      subcategory,
     );
   } else if (category) {
     categoryDistribution = getSubcategoryDistribution(
       questions,
       category,
-      categoryMap[category] || []
+      categoryMap[category] || [],
     );
   } else {
     categoryDistribution = getMainCategoryDistribution(questions, categoryMap);
@@ -63,7 +63,7 @@ export function calculateMetrics(
   });
 
   const difficultyDistribution = Object.entries(difficultyCounts).map(
-    ([name, value]) => ({ name, value })
+    ([name, value]) => ({ name, value }),
   );
 
   const totalFilteredQuestions = filteredQuestions.length;
@@ -81,7 +81,7 @@ export function calculateMetrics(
   };
 }
 
-function parseCategory(category: string) {
+export function parseCategory(category: string) {
   const [main, sub] = category.split(":").map((s) => s.trim());
 
   return { main, sub };
@@ -89,7 +89,7 @@ function parseCategory(category: string) {
 
 function getMainCategoryDistribution(
   questions: Question[],
-  categoryMap: CategoryMap
+  categoryMap: CategoryMap,
 ): Distribution {
   return Object.keys(categoryMap).map((category) => ({
     name: category,
@@ -100,18 +100,17 @@ function getMainCategoryDistribution(
 function getSubcategoryDistribution(
   questions: Question[],
   category: string,
-  subcategories: string[]
+  subcategories: string[],
 ): Distribution {
   if (subcategories.length > 0) {
     return subcategories.map((sub) => ({
       name: sub,
-      value: questions.filter(
-        (q) => q.category === `${category}: ${sub}`
-      ).length,
+      value: questions.filter((q) => q.category === `${category}: ${sub}`)
+        .length,
     }));
   } else {
     const count = questions.filter(
-      (q) => parseCategory(q.category).main === category
+      (q) => parseCategory(q.category).main === category,
     ).length;
 
     return [{ name: category, value: count }];
@@ -121,7 +120,7 @@ function getSubcategoryDistribution(
 function getSpecificSubcategoryDistribution(
   questions: Question[],
   category: string,
-  subcategory: string
+  subcategory: string,
 ): Distribution {
   const fullCategory = `${category}: ${subcategory}`;
   const count = questions.filter((q) => q.category === fullCategory).length;

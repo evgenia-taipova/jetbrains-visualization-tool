@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react"; 
+import { useState, useMemo } from "react";
 import { CategoryList } from "../components/CategoryList";
 import { CategoryDistribution } from "../components/CategoryDistribution";
 import { QuestionList } from "../components/QuestionList";
@@ -21,7 +21,7 @@ export default function Home() {
   const filteredQuestions = useFilteredQuestions(questions, selected);
 
   const {
-    categoryMap, 
+    categoryMap,
     counts,
     categoryDistribution,
     difficultyDistribution,
@@ -29,7 +29,7 @@ export default function Home() {
     selectedText,
   } = useMemo(() => {
     return calculateMetrics(questions, filteredQuestions, selected);
-  }, [questions, filteredQuestions, selected]); 
+  }, [questions, filteredQuestions, selected]);
 
   if (isLoading) {
     return <Loader />;

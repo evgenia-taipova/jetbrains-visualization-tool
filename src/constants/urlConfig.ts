@@ -1,3 +1,3 @@
 export const urls = {
-  trivia: 'https://opentdb.com',
-} 
+  trivia: "https://opentdb.com",
+};
