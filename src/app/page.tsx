@@ -64,8 +64,12 @@ export default function Home() {
   const filteredQuestions = questions.filter((q) => {
     const { category, subcategory } = selected;
     if (!category) return true;
-    if (subcategory) return q.category === `${category}: ${subcategory}`;
-    return q.category.startsWith(category);
+    if (subcategory) {
+      return q.category === `${category}: ${subcategory}`;
+    } else {
+      const { main } = parseCategory(q.category);
+      return main === category;
+    }
   });
 
   let categoryDistribution: { name: string; value: number }[] = [];
