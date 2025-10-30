@@ -5,6 +5,8 @@ import { CategoryList } from "../components/CategoryList";
 import { CategoryDistribution } from "../components/CategoryDistribution";
 import { QuestionList } from "../components/QuestionList";
 import { DifficultyDistribution } from "../components/DifficultyDistribution";
+import { Loader } from "../components/ui/Loader";
+import { ErrorDisplay } from "../components/ui/ErrorDisplay";
 import { useFilteredQuestions } from "../hooks/useFilteredQuestions";
 import { useTriviaQuestions } from "../hooks/useTriviaQuestions";
 
@@ -24,28 +26,11 @@ export default function Home() {
   const filteredQuestions = useFilteredQuestions(questions, selected);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <h1 className="text-2xl">Loading questions...</h1>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (error) {
-    return (
-      <div className="flex flex-col gap-4 justify-center items-center h-screen">
-        <h1 className="text-3xl font-bold text-red-600">
-          Error fetching questions
-        </h1>
-        <p className="text-gray-400">{error}</p>
-        <button 
-            onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-800 transition-colors cursor-pointer"
-          >
-            Try again
-          </button>
-      </div>
-    );
+    return <ErrorDisplay error={error} />;
   }
 
   const categoryMap: Record<string, string[]> = {};
