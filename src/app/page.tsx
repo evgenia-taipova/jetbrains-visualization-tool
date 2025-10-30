@@ -108,6 +108,12 @@ export default function Home() {
     ([name, value]) => ({ name, value })
   );
 
+  const totalFilteredQuestions = filteredQuestions.length;
+
+  const selectedText = selected.subcategory
+    ? `${selected.category}: ${selected.subcategory}`
+    : selected.category || "All categories";
+
   return (
     <div className="flex">
       <CategoryList
@@ -119,14 +125,24 @@ export default function Home() {
       />
 
       <div className="p-8 w-full">
-        <h1 className="text-2xl font-bold mb-4">Trivia Questions</h1>
+        <h1 className="text-2xl font-bold mb-4">
+          Mini Vizualization App for Trivia Questions
+        </h1>
+        <div className="p-4 mb-4 border rounded bg-gray-50">
+          <p>
+            <strong>Selected Category:</strong> {selectedText}
+          </p>
+          <p>
+            <strong>Total Questions:</strong> {totalFilteredQuestions}
+          </p>
+        </div>
         <div className="flex gap-8 mb-8">
           {categoryDistribution.length > 0 && (
             <CategoryDistribution categoryDistribution={categoryDistribution} />
           )}
           <DifficultyDistribution data={difficultyDistribution} />
         </div>
-        {/* <QuestionList questions={filteredQuestions} /> */}
+        <QuestionList questions={filteredQuestions} />
       </div>
     </div>
   );
