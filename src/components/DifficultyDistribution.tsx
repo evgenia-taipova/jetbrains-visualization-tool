@@ -14,7 +14,7 @@ interface Props {
 
 const DIFFICULTY_COLORS: Record<string, string> = {
   easy: "#2274A5",
-  medium: "#E83F6F", 
+  medium: "#E83F6F",
   hard: "#420039",
 };
 
@@ -36,10 +36,7 @@ export function DifficultyDistribution({ data }: Props) {
             label
           >
             {data.map((entry, index) => (
-              <Cell 
-                key={index} 
-                fill={DIFFICULTY_COLORS[entry.name]} 
-              />
+              <Cell key={index} fill={DIFFICULTY_COLORS[entry.name]} />
             ))}
           </Pie>
           <Tooltip />
