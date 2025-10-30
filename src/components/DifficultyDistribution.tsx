@@ -11,7 +11,12 @@ import {
 interface Props {
   data: { name: string; value: number }[];
 }
-const COLORS = ["#420039", "#E83F6F", "#2274A5"];
+
+const DIFFICULTY_COLORS: Record<string, string> = {
+  easy: "#2274A5",
+  medium: "#E83F6F", 
+  hard: "#420039",
+};
 
 export function DifficultyDistribution({ data }: Props) {
   return (
@@ -30,8 +35,11 @@ export function DifficultyDistribution({ data }: Props) {
             outerRadius={120}
             label
           >
-            {data.map((_, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            {data.map((entry, index) => (
+              <Cell 
+                key={index} 
+                fill={DIFFICULTY_COLORS[entry.name]} 
+              />
             ))}
           </Pie>
           <Tooltip />
